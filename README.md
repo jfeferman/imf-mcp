@@ -103,6 +103,10 @@ Claude (Anthropic's AI assistant) can launch IMF-MCP automatically as a tool. Yo
 > - You do not need to start the server yourself; Claude will handle launching and communication.
 > - For advanced configuration, refer to your Claude platform documentation for custom tool integration.
 
+#### Example timeseries analysis using Claude and IMF MCP
+
+https://claude.ai/public/artifacts/001c61fa-f349-4c53-962e-2b7a1093d8cd
+
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
