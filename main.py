@@ -1,10 +1,8 @@
-
 from typing import Any
 import httpx
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 
-mcp = FastMCP("imf")
-
+mcp = FastMCP("ImfDataServer")
 IMF_API_BASE = "https://www.imf.org/external/datamapper/api/v1"
 
 async def make_imf_request(endpoint: str, params: dict = None) -> dict[str, Any] | None:
@@ -39,9 +37,6 @@ async def get_countries(dataset_id: str) -> dict:
 @mcp.tool()
 async def get_timeseries(indicator: str, countries: str, start: int, end: int) -> dict:
     """Fetch time series data from IMF using indicator and country codes in the URL path, and periods as a query parameter."""
-    # countries: comma-separated country codes (e.g., "BR,US,CN")
-    # indicator: indicator code (e.g., "NGDP_RPCH")
-    # periods: comma-separated years
     periods = ",".join(str(y) for y in range(start, end + 1))
     path = f"timeseries/{indicator}/{countries}"
     params = {"periods": periods}
@@ -49,7 +44,10 @@ async def get_timeseries(indicator: str, countries: str, start: int, end: int) -
     return result
 
 def main():
-    mcp.run(transport='stdio')
+    host = '0.0.0.0'
+    port = 8080
+    print(f"[INFO] Starting IMF MCP server at http://{host}:{port}")
+    mcp.run(transport="http", host=host, port=port)
 
 if __name__ == "__main__":
     main()
