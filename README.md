@@ -32,18 +32,29 @@ IMF-MCP is a Python service that provides programmatic access to the Internation
 
 ## Usage
 
-Run the service:
+Run the service (stdio transport, for use with Claude and other MCP clients):
 
 ```sh
 python main.py
+# or with uv:
+uv run main.py
 ```
 
-This will start the FastMCP server and register the following tools:
+For local HTTP testing (e.g. with MCP Inspector), use the FastMCP CLI:
+
+```sh
+fastmcp run main.py --transport http --port 8080
+```
+
+The server registers the following tools:
 
 - `get_datasets`: Fetch available IMF datasets
 - `get_indicators(dataset_id)`: Fetch indicators for a dataset
 - `get_countries(dataset_id)`: Fetch countries for a dataset
 - `get_timeseries(indicator, countries, start, end)`: Fetch time series data for given indicator and countries over a year range
+- `get_ifs_indicators()`: Fetch IFS (International Financial Statistics) indicator codes; use with `get_timeseries`
+- `get_ifs_countries()`: Fetch IFS country/region codes; use with `get_timeseries`
+- `get_retrieval_guide()`: Return the retrieval guide (markdown); call first when answering IMF data questions
 
 ### Example: Fetching Datasets
 
@@ -64,6 +75,7 @@ asyncio.run(main())
 
 - `main.py` — Main application file, defines all tools and starts the server
 - `README.md` — Project documentation
+- `CLAUDE_IMF_GUIDE.md` — Retrieval guide; exposed as tool `get_retrieval_guide()` and as MCP resource `imf://retrieval-guide`
 
 ## Development
 
@@ -77,7 +89,7 @@ Claude (Anthropic's AI assistant) can launch IMF-MCP automatically as a tool. Yo
 
 #### Configuration Example (Local Setup)
 
-1. Open Claude settings and go to **Developer → Edit Config**.
+1. Open Claude settings and go to **Developer → Edit Config** (or add/edit your MCP config file, e.g. `claude_desktop_config.json` or the config used by your client).
 2. Add an entry to the `mcpServers` section like this:
 
 	 ```json
@@ -91,12 +103,21 @@ Claude (Anthropic's AI assistant) can launch IMF-MCP automatically as a tool. Yo
 		 ]
 	 }
 	 ```
-	 - Replace `/Users/yourusername/path/to/imf-mcp` with the actual path to your `imf-mcp` directory.
-	 - This example uses [uv](https://github.com/astral-sh/uv) to run the project in the correct environment. You can also use `python` or another environment manager if preferred.
+	 - Replace `/Users/yourusername/path/to/imf-mcp` with the **absolute path** to your `imf-mcp` directory.
+	 - The server runs over **stdio** by default, which is what Claude expects when it launches the process.
+	 - This example uses [uv](https://github.com/astral-sh/uv) so dependencies from `pyproject.toml` are used. You can use `python` instead if you run from an environment where `pip install .` was already run:
+	   ```json
+	   "imf-mcp": {
+	     "command": "python",
+	     "args": ["/Users/yourusername/path/to/imf-mcp/main.py"]
+	   }
+	   ```
 
 3. Save the config and restart Claude if necessary.
 
 4. When you ask Claude to use the IMF tool (e.g., "List available IMF datasets"), Claude will launch the tool as needed.
+
+**Retrieval guide:** The server exposes the guide as a **tool**: `get_retrieval_guide()`. When answering IMF data questions, call this first to get the recommended flow (dataset IDs like IFS/WEO, then get_indicators/get_countries for codes, then get_timeseries). The same content is also exposed as MCP resource `imf://retrieval-guide` for clients that support resource reading.
 
 > **Note:**
 > - Ensure the Python environment has all dependencies installed (e.g., via `uv pip install .` or `poetry install`).

@@ -3,8 +3,8 @@ name = "imf-mcp"
 version = "0.1.0"
 description = "IMF data api mcp server"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.10"
 dependencies = [
     "httpx>=0.28.1",
-    "fastmcp>=<latest_version>"
+    "fastmcp>=2.0"
 ]
