@@ -75,7 +75,7 @@ asyncio.run(main())
 
 - `main.py` — Main application file, defines all tools and starts the server
 - `README.md` — Project documentation
-- `CLAUDE_IMF_GUIDE.md` — Retrieval guide; exposed as tool `get_retrieval_guide()` and as MCP resource `imf://retrieval-guide`
+- `CLAUDE.md` — Retrieval guide; exposed as tool `get_retrieval_guide()` and as MCP resource `imf://retrieval-guide`
 
 ## Development
 

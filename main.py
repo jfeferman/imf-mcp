@@ -38,7 +38,7 @@ async def get_countries(dataset_id: str) -> dict:
 
 @mcp.tool()
 async def get_timeseries(indicator: str, countries: str, start: int, end: int) -> dict:
-    """Fetch time series data from IMF using indicator and country codes in the URL path, and periods as a query parameter."""
+    """Fetch time series for the given indicator and country/region codes. Only request countries relevant to the user: resolve names to codes first (e.g. via get_ifs_countries() or get_countries(dataset_id)), then pass one or more codes (e.g. "US" or "US,CN"). Do not request data for all countries."""
     periods = ",".join(str(y) for y in range(start, end + 1))
     path = f"timeseries/{indicator}/{countries}"
     params = {"periods": periods}
@@ -48,18 +48,18 @@ async def get_timeseries(indicator: str, countries: str, start: int, end: int) -
 
 @mcp.tool()
 async def get_ifs_indicators() -> dict:
-    """Fetch indicator codes for International Financial Statistics (IFS). IFS is a large dataset (thousands of indicators); use these codes with get_timeseries. Codes may include SDMX-style suffixes (e.g. .A annual, .Q quarterly)."""
+    """Fetch indicator codes for IFS as exposed by the IMF DataMapper API. What is returned may be the DataMapper indicator set rather than the full IFS code list; use the returned codes with get_timeseries. The full IFS database is available via other IMF APIs (e.g. SDMX)."""
     return await make_imf_request("indicators", {"datasets": "IFS"})
 
 
 @mcp.tool()
 async def get_ifs_countries() -> dict:
-    """Fetch country/region codes for International Financial Statistics (IFS). Use these codes with get_timeseries (e.g. US, CN)."""
+    """Fetch country/region codes for IFS from the DataMapper API. Use these codes with get_timeseries (e.g. US, CN)."""
     return await make_imf_request("countries", {"datasets": "IFS"})
 
 
 def _read_retrieval_guide() -> str:
-    path = _DIR / "CLAUDE_IMF_GUIDE.md"
+    path = _DIR / "CLAUDE.md"
     return path.read_text(encoding="utf-8") if path.exists() else ""
 
 
